@@ -4,8 +4,11 @@ namespace Umbrella.DrugStore.WebApi.Models
 {
     public class CreateUserModel
     {
-        [Required(ErrorMessage = "User Name é obrigatório!")]
-        public string? UserName { get; set; }
+        [Required(ErrorMessage = "Nome é obrigatório!")]
+        public string Nome { get; set; }
+
+        [Required(ErrorMessage = "CPF é obrigatório!")]
+        public long CPF { get; set; }
 
         [Required(ErrorMessage = "IsAdmin é obrigatório!")]
         public bool IsAdmin { get; set; } = false;
@@ -15,6 +18,9 @@ namespace Umbrella.DrugStore.WebApi.Models
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "Password é obrigatório!")]
-        public string? Password { get; set; }
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Confirmação do password é obrigatório!")]
+        public string ConfirmPassword { get; set; }
     }
 }

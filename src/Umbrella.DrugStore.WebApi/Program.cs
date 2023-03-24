@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Umbrella.DrugStore.WebApi.Auth;
 using Umbrella.DrugStore.WebApi.Context;
+using Umbrella.DrugStore.WebApi.Extenssions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,14 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 //AddDbContext
 builder.Services.AddDbContextPool<BloggingContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite("Data Source=Funds.db").EnableServiceProviderCaching(false);
 });
 
 
 //AddIdentity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<UserEntity, IdentityRole>()
     .AddEntityFrameworkStores<BloggingContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<AuthenticatedUser>();
 
 //AddAuthentication
 builder.Services.AddAuthentication(options =>

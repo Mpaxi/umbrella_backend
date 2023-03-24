@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Umbrella.DrugStore.WebApi.Auth;
@@ -13,11 +15,11 @@ namespace Umbrella.DrugStore.WebApi.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<IdentityUser> _userManager;        
+        private readonly UserManager<UserEntity> _userManager;        
 
         public AuthenticateController(
             IConfiguration configuration,
-            UserManager<IdentityUser> userManager)
+            UserManager<UserEntity> userManager)
         {
             _configuration = configuration;
             _userManager = userManager;
@@ -27,7 +29,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user is not null && await _userManager.CheckPasswordAsync(user, model.Password) && user.LockoutEnabled.Equals(false))
             {
@@ -50,10 +52,11 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
         [Route("deactive")]
         public async Task<IActionResult> Deactive([FromBody] DeactiveModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user is not null)
             {
@@ -68,10 +71,11 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
         [Route("active")]
         public async Task<IActionResult> Active([FromBody] DeactiveModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user is not null)
             {

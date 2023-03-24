@@ -4,25 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Umbrella.DrugStore.WebApi.Auth;
+using Umbrella.DrugStore.WebApi.Extenssions;
 using Umbrella.DrugStore.WebApi.Models;
 
 namespace Umbrella.DrugStore.WebApi.Controllers
 {
     public class UserController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<UserEntity> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly AuthenticatedUser _authenticatedUser;
+        public UserController(UserManager<UserEntity> userManager, RoleManager<IdentityRole> roleManager, AuthenticatedUser authenticatedUser)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _authenticatedUser = authenticatedUser;
         }
 
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserModel model)
         {
-            var userExists = await _userManager.FindByEmailAsync(model.UserName);
+            if (!model.Password.Equals(model.ConfirmPassword))
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
+                );
+
+            var userExists = await _userManager.FindByEmailAsync(model.Email);
 
             if (userExists is not null)
                 return StatusCode(
@@ -30,11 +39,13 @@ namespace Umbrella.DrugStore.WebApi.Controllers
                     new ResponseModel { Success = false, Message = "Usuário já existe!" }
                 );
 
-            IdentityUser user = new()
+            UserEntity user = new()
             {
                 SecurityStamp = Guid.NewGuid().ToString(),
                 Email = model.Email,
-                UserName = model.UserName,
+                Nome = model.Nome,
+                CPF = model.CPF,
+                UserName = model.Email,
                 LockoutEnabled = false
             };
 
@@ -48,7 +59,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
             await _userManager.SetLockoutEnabledAsync(user, false);
 
-            var role = model.IsAdmin ? UserRoles.Admin : UserRoles.User;
+            var role = model.IsAdmin ? UserRoles.Admin : UserRoles.Restockers;
 
             await AddToRoleAsync(user, role);
 
@@ -60,38 +71,64 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("getUsers")]
         public async Task<IActionResult> CreateUserAsync()
         {
-            return Ok(new ResponseModel { Data = await _userManager.Users.Select(s => new { s.UserName, s.Email, s.LockoutEnabled}).ToListAsync() });
+            return Ok(new ResponseModel { Data = await _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).ToListAsync() });
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
         [Route("update")]
         public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            UserEntity user = await _userManager.FindByIdAsync(model.Id.ToString());
+            var role = model.IsAdmin ? UserRoles.Admin : UserRoles.Restockers;
 
-            if (user is null)
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new ResponseModel { Success = false, Message = "Usuário não já existe!" }
-                );
+            if (user.UserName.Equals(_authenticatedUser.Email))
+            {
+                
+                if (!model.Password.Equals(model.ConfirmPassword))
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
+                    );
 
-            user.Email = model.Email;
+                if (user is null)
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new ResponseModel { Success = false, Message = "Usuário não já existe!" }
+                    );
 
-            var result = await _userManager.UpdateAsync(user);
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            if (!result.Succeeded)
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new ResponseModel { Success = false, Message = "Erro ao atualizar usuário" }
-                );
+                var result = await _userManager.ResetPasswordAsync(user, resetToken, model.Password);
+
+                if (!result.Succeeded)
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new ResponseModel { Success = false, Message = "Erro ao atualizar usuário" }
+                    );
+
+                user.Nome = model.Nome;
+                user.CPF = model.CPF;
+
+                result = await _userManager.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new ResponseModel { Success = false, Message = "Erro ao atualizar usuário" }
+                    );               
+
+                await AddToRoleAsync(user, role);
+
+                return Ok(new ResponseModel { Message = "Usuário atualizado com sucesso!" });
+            }
+
+            await AddToRoleAsync(user, role);
 
             return Ok(new ResponseModel { Message = "Usuário atualizado com sucesso!" });
-
-
-
         }
 
-        private async Task AddToRoleAsync(IdentityUser user, string role)
+        private async Task AddToRoleAsync(UserEntity user, string role)
         {
             if (!await _roleManager.RoleExistsAsync(role))
                 await _roleManager.CreateAsync(new(role));

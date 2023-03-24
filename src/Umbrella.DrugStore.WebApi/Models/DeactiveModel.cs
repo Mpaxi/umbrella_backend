@@ -4,7 +4,8 @@ namespace Umbrella.DrugStore.WebApi.Models
 {
     public class DeactiveModel
     {
-        [Required(ErrorMessage = "User Name é obrigatório!")]
-        public string? UserName { get; set; }
+        [EmailAddress]
+        [Required(ErrorMessage = "Email é obrigatório!")]
+        public string? Email { get; set; }
     }
 }

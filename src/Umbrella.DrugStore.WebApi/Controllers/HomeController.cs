@@ -22,8 +22,8 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         public string GetAuthenticated() => $"Autenticado - {User?.Identity?.Name} ";
 
         [HttpGet]
-        [Route("user")]
-        [Authorize(Roles = UserRoles.User)]
+        [Route("restockers")]
+        [Authorize(Roles = UserRoles.Restockers)]
         public string GetUser() => "User";
 
         [HttpGet]

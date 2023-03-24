@@ -5,8 +5,9 @@
     using Microsoft.EntityFrameworkCore;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using Umbrella.DrugStore.WebApi.Auth;
 
-    public class BloggingContext : IdentityDbContext<IdentityUser>
+    public class BloggingContext : IdentityDbContext<UserEntity>
     {
         protected override void OnModelCreating(ModelBuilder builder)
         {
