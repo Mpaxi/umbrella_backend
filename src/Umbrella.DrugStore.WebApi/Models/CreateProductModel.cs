@@ -9,7 +9,6 @@ namespace Umbrella.DrugStore.WebApi.Models
         public decimal Price { get; set; }
         public int Unit { get; set; }
         public decimal Rating { get; set; }
-
         public Product toProduct()
         {
             return new Product{

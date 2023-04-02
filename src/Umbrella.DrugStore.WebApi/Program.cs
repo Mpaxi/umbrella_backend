@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,8 @@ using System.Text;
 using Umbrella.DrugStore.WebApi.Auth;
 using Umbrella.DrugStore.WebApi.Context;
 using Umbrella.DrugStore.WebApi.Extenssions;
+using Umbrella.DrugStore.WebApi.Repository;
+using Umbrella.DrugStore.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,8 @@ builder.Services.AddIdentity<UserEntity, IdentityRole>()
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<AuthenticatedUser>();
+
+builder.Services.AddTransient<IAzureStorage, AzureStorage>();
 
 //AddAuthentication
 builder.Services.AddAuthentication(options =>
@@ -84,6 +89,13 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+//builder.Services.AddScoped(_ =>
+//{
+//    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureStorage"));
+//});
+
+
 
 var app = builder.Build();
 
