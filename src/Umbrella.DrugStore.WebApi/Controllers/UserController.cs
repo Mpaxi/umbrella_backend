@@ -70,7 +70,23 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("getUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).ToList() });
+            var data = _userManager.Users.ToList();
+            
+            var retorno = data.Select(s => 
+            new { 
+                s.Id, 
+                s.UserName, 
+                s.Nome, 
+                s.CPF, 
+                s.Email, 
+                s.LockoutEnabled,
+                Roles = _userManager.GetRolesAsync(s).Result
+            }
+            ).ToList();
+
+            return Ok(new ResponseModel { Data = retorno });
+
+            //return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).ToList() });
         }
 
         [HttpGet]
