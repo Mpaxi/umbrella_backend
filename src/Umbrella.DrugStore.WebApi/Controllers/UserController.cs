@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Umbrella.DrugStore.WebApi.Auth;
 using Umbrella.DrugStore.WebApi.Extenssions;
@@ -69,9 +68,17 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("getUsers")]
-        public async Task<IActionResult> CreateUserAsync()
+        public async Task<IActionResult> GetUsersAsync()
         {
-            return Ok(new ResponseModel { Data = await _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).ToListAsync() });
+            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).ToList() });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("getUser")]
+        public async Task<IActionResult> GetUserAsync([FromQuery] Guid Id)
+        {
+            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
         }
 
         [HttpPost]
@@ -84,7 +91,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
             if (user.UserName.Equals(_authenticatedUser.Email))
             {
-                
+
                 if (!model.Password.Equals(model.ConfirmPassword))
                     return StatusCode(
                         StatusCodes.Status500InternalServerError,
@@ -116,7 +123,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
                     return StatusCode(
                         StatusCodes.Status500InternalServerError,
                         new ResponseModel { Success = false, Message = "Erro ao atualizar usuário" }
-                    );               
+                    );
 
                 await AddToRoleAsync(user, role);
 
