@@ -94,7 +94,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("getProduct")]
+        [Route("getProductsUser")]
         public async Task<IActionResult> GetProductsUserAsync()
         {
             try
