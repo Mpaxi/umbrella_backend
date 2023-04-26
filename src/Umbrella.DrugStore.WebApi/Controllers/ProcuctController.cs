@@ -76,13 +76,31 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
         [Route("getProduct")]
         public async Task<IActionResult> GetProductsAsync()
         {
             try
             {
-                var products = _context.Products.Where(w => w.Active.Equals(true)).ToList();
+                var products = _context.Products.ToList();
                 
+                return Ok(new ResponseModel { Data = products.OrderByDescending(o => o.Created) });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModel { Data = ex.Message }); ;
+            }
+        }
+
+        [HttpGet]
+        [Route("getProduct")]
+        public async Task<IActionResult> GetProductsUserAsync()
+        {
+            try
+            {
+                var products = _context.Products.Where(w => w.Active.Equals(true)).ToList();
+
                 return Ok(new ResponseModel { Data = products.OrderByDescending(o => o.Created) });
             }
             catch (Exception ex)
