@@ -16,7 +16,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
         [Route("addProduct")]
         public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductModel model)
         {
@@ -34,9 +34,28 @@ namespace Umbrella.DrugStore.WebApi.Controllers
             }
         }
 
+        [HttpPut]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
+        [Route("updateProduct")]
+        public async Task<IActionResult> UpdateProductAsync([FromBody] UpdateProductModel model)
+        {
+            try
+            {
+
+                var product = _context.Products.Update(model.ToProduct());
+                await _context.SaveChangesAsync();
+
+                return Ok(new ResponseModel { Data = product.Entity });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModel { Data = ex.Message }); ;
+            }
+        }
+
+
         [HttpGet]
-        [Authorize(Roles = UserRoles.Admin)]
-        //[Authorize(Roles = UserRoles.Restockers)]
         [Route("getProduct")]
         public async Task<IActionResult> GetProductsAsync()
         {
@@ -54,7 +73,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = UserRoles.Admin)]
+
         //[Authorize(Roles = UserRoles.Restockers)]
         [Route("getProductById")]
         public async Task<IActionResult> GetProductsAsync([FromQuery]Guid id)
