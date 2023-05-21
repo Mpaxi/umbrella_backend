@@ -128,7 +128,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         {
             try
             {
-                var products = _context.Products.Where(w => w.Active.Equals(true)).ToList();
+                var products = _context.Products.Include(i => i.Images).Where(w => w.Active.Equals(true)).ToList();
 
                 return Ok(new ResponseModel { Data = products.OrderByDescending(o => o.Created) });
             }
@@ -147,7 +147,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         {
             try
             {
-                var product = await _context.Products.FirstOrDefaultAsync(w => w.Active.Equals(true) && w.Id.Equals(id));
+                var product = await _context.Products.Include(i => i.Images).FirstOrDefaultAsync(w => w.Active.Equals(true) && w.Id.Equals(id));
 
                 return Ok(new ResponseModel { Data = product });
             }
