@@ -67,6 +67,60 @@ namespace Umbrella.DrugStore.WebApi.Controllers
             return Ok(new ResponseModel { Message = "Usuário criado com sucesso!" });
         }
 
+        [HttpPost]
+        [Route("registerClient")]
+        public async Task<IActionResult> CreateUserClientAsync([FromBody]CreateUserClientModel model)
+        {
+            if (!model.Password.Equals(model.ConfirmPassword))
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
+                );
+
+            var userExists = await _userManager.FindByEmailAsync(model.Email);
+
+            if (userExists is not null)
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ResponseModel { Success = false, Message = "Usuário já existe!" }
+                );
+
+            UserEntity user = new()
+            {
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Email = model.Email,
+                Nome = model.Nome,
+                CPF = model.CPF,
+                Masculino = model.Masculino,
+                DataNascimento = model.DataNascimento,
+                Rua = model.Rua,
+                Numero = model.Numero,
+                Complemento = model.Complemento,
+                Bairro = model.Bairro,
+                Cidade = model.Cidade,
+                UF = model.UF,
+                CEP = model.CEP,
+                UserName = model.Email,
+                LockoutEnabled = false
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (!result.Succeeded)
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
+                );
+
+            await _userManager.SetLockoutEnabledAsync(user, false);
+
+            var role = UserRoles.Client;
+
+            await AddToRoleAsync(user, role);
+
+            return Ok(new ResponseModel { Message = "Usuário criado com sucesso!" });
+        }
+
         [HttpGet]
         //[Authorize(Roles = UserRoles.Admin)]
         [Route("getUsers")]
