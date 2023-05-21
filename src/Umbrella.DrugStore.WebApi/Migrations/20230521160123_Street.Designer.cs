@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbrella.DrugStore.WebApi.Context;
 
@@ -10,9 +11,10 @@ using Umbrella.DrugStore.WebApi.Context;
 namespace Umbrella.DrugStore.WebApi.Migrations
 {
     [DbContext(typeof(BloggingContext))]
-    partial class BloggingContextModelSnapshot : ModelSnapshot
+    [Migration("20230521160123_Street")]
+    partial class Street
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.15");
@@ -154,25 +156,26 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Bairro")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CEP")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<long>("CPF")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Cidade")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Complemento")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataNascimento")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -188,9 +191,6 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("Masculino")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -203,7 +203,7 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Numero")
+                    b.Property<int>("Numero")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PasswordHash")
@@ -216,6 +216,7 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Rua")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
@@ -225,6 +226,7 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UF")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")

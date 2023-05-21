@@ -44,6 +44,8 @@ namespace Umbrella.DrugStore.WebApi.Controllers
                 Email = model.Email,
                 Nome = model.Nome,
                 CPF = model.CPF,
+                Masculino = model.Masculino,
+                DataNascimento = model.DataNascimento,
                 UserName = model.Email,
                 LockoutEnabled = false
             };
@@ -66,7 +68,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = UserRoles.Admin)]
+        //[Authorize(Roles = UserRoles.Admin)]
         [Route("getUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
@@ -77,9 +79,17 @@ namespace Umbrella.DrugStore.WebApi.Controllers
                 s.Id, 
                 s.UserName, 
                 s.Nome, 
-                s.CPF, 
+                s.CPF,
+                s.Masculino,
+                s.DataNascimento,
                 s.Email, 
                 s.LockoutEnabled,
+                s.Rua,
+                s.Numero,
+                s.Complemento,
+                s.Bairro,
+                s.Cidade,
+                s.CEP,
                 Roles = _userManager.GetRolesAsync(s).Result
             }
             ).ToList();
@@ -94,7 +104,10 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("getUser")]
         public async Task<IActionResult> GetUserAsync([FromQuery] Guid Id)
         {
-            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF, s.Email, s.LockoutEnabled }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
+            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF,
+                s.Masculino,
+                s.DataNascimento,
+                s.Email, s.LockoutEnabled, s.Rua, s.Numero, s.Complemento, s.Bairro, s.Cidade, s.CEP }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
         }
 
         [HttpPost]

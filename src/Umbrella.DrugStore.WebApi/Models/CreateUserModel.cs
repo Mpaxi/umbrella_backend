@@ -10,6 +10,12 @@ namespace Umbrella.DrugStore.WebApi.Models
         [Required(ErrorMessage = "CPF é obrigatório!")]
         public long CPF { get; set; }
 
+        [Required(ErrorMessage = "Genero é obrigatório!")]
+        public bool Masculino { get; set; }
+
+        [Required(ErrorMessage = "DataNascimento é obrigatório!")]
+        public DateTime DataNascimento { get; set; }
+
         [Required(ErrorMessage = "IsAdmin é obrigatório!")]
         public bool IsAdmin { get; set; } = false;
 
