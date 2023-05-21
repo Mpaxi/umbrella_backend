@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 using Umbrella.DrugStore.WebApi.Auth;
 using Umbrella.DrugStore.WebApi.Context;
 using Umbrella.DrugStore.WebApi.Extenssions;
@@ -18,8 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 //AddDbContext
 builder.Services.AddDbContextPool<BloggingContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    //options.UseSqlite("Data Source=Funds.db").EnableServiceProviderCaching(false);
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite("Data Source=Funds.db").EnableServiceProviderCaching(false);
+
 });
 
 
@@ -59,7 +61,9 @@ builder.Services.AddAuthentication(options =>
 
 
 builder.Services.AddCors();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

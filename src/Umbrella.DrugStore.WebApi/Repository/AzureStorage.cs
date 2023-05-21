@@ -112,16 +112,22 @@ namespace Umbrella.DrugStore.WebApi.Repository
 
         public async Task<BlobResponseDto> UploadAsync(IFormFile file)
         {
+            var extensionName = System.IO.Path.GetExtension(file.FileName);
+
+            var filename = $"{Guid.NewGuid()}{extensionName}";
+
             // Create new upload response object that we can return to the requesting method
             BlobResponseDto response = new();
 
             // Get a reference to a container named in appsettings.json and then create it
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
+            
+
             //await container.CreateAsync();
             try
             {
                 // Get a reference to the blob just uploaded from the API in a container from configuration settings
-                BlobClient client = container.GetBlobClient(file.FileName);
+                BlobClient client = container.GetBlobClient(filename);
 
                 // Open a stream for the file we want to upload
                 await using (Stream? data = file.OpenReadStream())

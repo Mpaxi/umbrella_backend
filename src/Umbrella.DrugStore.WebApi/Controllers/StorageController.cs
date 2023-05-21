@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Umbrella.DrugStore.WebApi.Entities;
 using Umbrella.DrugStore.WebApi.Models;
 using Umbrella.DrugStore.WebApi.Services;
 
@@ -28,7 +29,31 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [HttpPost(nameof(Upload))]
         public async Task<IActionResult> Upload(IFormFile cover, List<IFormFile> photos, [FromForm]CreateProductModel product)
         {
+            var addProduct = product.toProduct();
+
             BlobResponseDto? response = await _storage.UploadAsync(cover);
+            if(!response.Error)
+            {
+                addProduct.Images.Add(new Image
+                {
+                    Source = response.Blob.Uri,
+                    Type = EnumImageType.Cover
+                });
+            }           
+
+            foreach (var photo in photos)
+            {
+                response = await _storage.UploadAsync(photo);
+                if (!response.Error)
+                {
+                    addProduct.Images.Add(new Image
+                    {
+                        Source = response.Blob.Uri,
+                        Type = EnumImageType.Cover
+                    });
+                }
+            }
+                
 
             // Check if we got an error
             if (response.Error == true)

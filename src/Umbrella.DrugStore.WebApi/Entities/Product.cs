@@ -7,5 +7,6 @@
         public decimal Price { get; set; }
         public int Unit { get; set; }
         public decimal Rating { get; set; }
+        public List<Image> Images { get; set; } = new List<Image>();
     }
 }
