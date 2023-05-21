@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Umbrella.DrugStore.WebApi.Auth;
 using Umbrella.DrugStore.WebApi.Extenssions;
@@ -8,6 +9,8 @@ using Umbrella.DrugStore.WebApi.Models;
 
 namespace Umbrella.DrugStore.WebApi.Controllers
 {
+    [Route("[controller]")]
+    [ApiController]
     public class UserController : ControllerBase
     {
         private readonly UserManager<UserEntity> _userManager;
@@ -67,66 +70,14 @@ namespace Umbrella.DrugStore.WebApi.Controllers
             return Ok(new ResponseModel { Message = "Usuário criado com sucesso!" });
         }
 
-        [HttpPost]
-        [Route("registerClient")]
-        public async Task<IActionResult> CreateUserClientAsync([FromBody]CreateUserClientModel model)
-        {
-            if (!model.Password.Equals(model.ConfirmPassword))
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
-                );
 
-            var userExists = await _userManager.FindByEmailAsync(model.Email);
-
-            if (userExists is not null)
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new ResponseModel { Success = false, Message = "Usuário já existe!" }
-                );
-
-            UserEntity user = new()
-            {
-                SecurityStamp = Guid.NewGuid().ToString(),
-                Email = model.Email,
-                Nome = model.Nome,
-                CPF = model.CPF,
-                Masculino = model.Masculino,
-                DataNascimento = model.DataNascimento,
-                Rua = model.Rua,
-                Numero = model.Numero,
-                Complemento = model.Complemento,
-                Bairro = model.Bairro,
-                Cidade = model.Cidade,
-                UF = model.UF,
-                CEP = model.CEP,
-                UserName = model.Email,
-                LockoutEnabled = false
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new ResponseModel { Success = false, Message = "Erro ao criar usuário" }
-                );
-
-            await _userManager.SetLockoutEnabledAsync(user, false);
-
-            var role = UserRoles.Client;
-
-            await AddToRoleAsync(user, role);
-
-            return Ok(new ResponseModel { Message = "Usuário criado com sucesso!" });
-        }
 
         [HttpGet]
         //[Authorize(Roles = UserRoles.Admin)]
         [Route("getUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            var data = _userManager.Users.ToList();
+            var data = _userManager.Users.Include(i => i.Address).ToList();
             
             var retorno = data.Select(s => 
             new { 
@@ -138,12 +89,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
                 s.DataNascimento,
                 s.Email, 
                 s.LockoutEnabled,
-                s.Rua,
-                s.Numero,
-                s.Complemento,
-                s.Bairro,
-                s.Cidade,
-                s.CEP,
+                s.Address,
                 Roles = _userManager.GetRolesAsync(s).Result
             }
             ).ToList();
@@ -158,10 +104,10 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("getUser")]
         public async Task<IActionResult> GetUserAsync([FromQuery] Guid Id)
         {
-            return Ok(new ResponseModel { Data = _userManager.Users.Select(s => new { s.Id, s.UserName, s.Nome, s.CPF,
+            return Ok(new ResponseModel { Data = _userManager.Users.Include(i => i.Address).Select(s => new { s.Id, s.UserName, s.Nome, s.CPF,
                 s.Masculino,
                 s.DataNascimento,
-                s.Email, s.LockoutEnabled, s.Rua, s.Numero, s.Complemento, s.Bairro, s.Cidade, s.CEP }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
+                s.Email, s.LockoutEnabled, s.Address }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
         }
 
         [HttpPost]

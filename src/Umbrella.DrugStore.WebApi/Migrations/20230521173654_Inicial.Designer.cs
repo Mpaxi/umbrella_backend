@@ -11,8 +11,8 @@ using Umbrella.DrugStore.WebApi.Context;
 namespace Umbrella.DrugStore.WebApi.Migrations
 {
     [DbContext(typeof(BloggingContext))]
-    [Migration("20230521160332_Street update")]
-    partial class Streetupdate
+    [Migration("20230521173654_Inicial")]
+    partial class Inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -147,6 +147,46 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Auth.Address", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Bairro")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Numero")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Principal")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Rua")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UF")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserEntityId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserEntityId");
+
+                    b.ToTable("Address");
+                });
+
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Auth.UserEntity", b =>
                 {
                     b.Property<string>("Id")
@@ -155,23 +195,14 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Bairro")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("TEXT");
-
                     b.Property<long>("CPF")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Cidade")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataNascimento")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -187,6 +218,9 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Masculino")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -199,9 +233,6 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Numero")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -211,17 +242,11 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Rua")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -359,6 +384,13 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Auth.Address", b =>
+                {
+                    b.HasOne("Umbrella.DrugStore.WebApi.Auth.UserEntity", null)
+                        .WithMany("Address")
+                        .HasForeignKey("UserEntityId");
+                });
+
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Image", b =>
                 {
                     b.HasOne("Umbrella.DrugStore.WebApi.Entities.Product", "Product")
@@ -368,6 +400,11 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Auth.UserEntity", b =>
+                {
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Product", b =>

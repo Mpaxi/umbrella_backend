@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Umbrella.DrugStore.WebApi.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Inicial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,6 +30,8 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Nome = table.Column<string>(type: "TEXT", nullable: false),
                     CPF = table.Column<long>(type: "INTEGER", nullable: false),
+                    Masculino = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DataNascimento = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -88,6 +90,31 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Rua = table.Column<string>(type: "TEXT", nullable: true),
+                    Numero = table.Column<int>(type: "INTEGER", nullable: true),
+                    Complemento = table.Column<string>(type: "TEXT", nullable: true),
+                    Bairro = table.Column<string>(type: "TEXT", nullable: true),
+                    Cidade = table.Column<string>(type: "TEXT", nullable: true),
+                    UF = table.Column<string>(type: "TEXT", nullable: true),
+                    CEP = table.Column<string>(type: "TEXT", nullable: true),
+                    Principal = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UserEntityId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Address_AspNetUsers_UserEntityId",
+                        column: x => x.UserEntityId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -199,6 +226,11 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Address_UserEntityId",
+                table: "Address",
+                column: "UserEntityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -243,6 +275,9 @@ namespace Umbrella.DrugStore.WebApi.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Address");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
