@@ -5,6 +5,7 @@ namespace Umbrella.DrugStore.WebApi.Models
     public class CreateUserModel
     {
         [Required(ErrorMessage = "Nome é obrigatório!")]
+        [MinLength(3)]
         public string Nome { get; set; }
 
         [Required(ErrorMessage = "CPF é obrigatório!")]
