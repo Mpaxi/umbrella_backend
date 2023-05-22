@@ -124,13 +124,18 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
         [HttpGet]
         [Route("getProductsUser")]
-        public async Task<IActionResult> GetProductsUserAsync()
+        public async Task<IActionResult> GetProductsUserAsync([FromQuery]int Page = 1)
         {
             try
             {
-                var products = _context.Products.Include(i => i.Images).Where(w => w.Active.Equals(true)).ToList();
+                var products = _context.Products.Include(i => i.Images).Where(w => w.Active.Equals(true))
+                    .Skip((Page - 1) * 10)
+                    .Take(10)
+                    .ToList();
 
-                return Ok(new ResponseModel { Data = products.OrderByDescending(o => o.Created) });
+                var count = _context.Products.Count().ToString();
+
+                return Ok(new ResponseModel { Data = products.OrderByDescending(o => o.Created), Success = true, Message = _context.Products.Count().ToString() });
             }
             catch (Exception ex)
             {
