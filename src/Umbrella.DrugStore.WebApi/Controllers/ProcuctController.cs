@@ -20,7 +20,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
+        //[Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
         [Route("addProduct")]
         public async Task<IActionResult> CreateProductAsync(IFormFile cover, List<IFormFile> photos, [FromForm]CreateProductModel model)
         {

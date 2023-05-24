@@ -19,8 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 //AddDbContext
 builder.Services.AddDbContextPool<BloggingContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    //options.UseSqlite("Data Source=Funds.db").EnableServiceProviderCaching(false);
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite("Data Source=Funds.db").EnableServiceProviderCaching(false);
+    options.EnableSensitiveDataLogging();
 
 });
 
