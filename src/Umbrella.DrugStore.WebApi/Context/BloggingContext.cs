@@ -14,7 +14,6 @@
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Chart> Charts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

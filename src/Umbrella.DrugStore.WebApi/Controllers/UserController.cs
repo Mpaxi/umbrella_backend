@@ -73,21 +73,22 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
 
         [HttpGet]
-        //[Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = UserRoles.Admin)]
         [Route("getUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
             var data = _userManager.Users.Include(i => i.Address).ToList();
-            
-            var retorno = data.Select(s => 
-            new { 
-                s.Id, 
-                s.UserName, 
-                s.Nome, 
+
+            var retorno = data.Select(s =>
+            new
+            {
+                s.Id,
+                s.UserName,
+                s.Nome,
                 s.CPF,
                 s.Masculino,
                 s.DataNascimento,
-                s.Email, 
+                s.Email,
                 s.LockoutEnabled,
                 s.Address,
                 Roles = _userManager.GetRolesAsync(s).Result
@@ -104,11 +105,50 @@ namespace Umbrella.DrugStore.WebApi.Controllers
         [Route("getUser")]
         public async Task<IActionResult> GetUserAsync([FromQuery] Guid Id)
         {
-            return Ok(new ResponseModel { Data = _userManager.Users.Include(i => i.Address).Select(s => new { s.Id, s.UserName, s.Nome, s.CPF,
-                s.Masculino,
-                s.DataNascimento,
-                s.Email, s.LockoutEnabled, s.Address }).FirstOrDefault(w => w.Id.Equals(Id.ToString())) });
+            return Ok(new ResponseModel
+            {
+                Data = _userManager.Users.Include(i => i.Address).Select(s => new
+                {
+                    s.Id,
+                    s.UserName,
+                    s.Nome,
+                    s.CPF,
+                    s.Masculino,
+                    s.DataNascimento,
+                    s.Email,
+                    s.LockoutEnabled,
+                    s.Address
+                }).FirstOrDefault(w => w.Id.Equals(Id.ToString()))
+            });
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("getUserInfo")]
+        public async Task<IActionResult> GetUserInfoAsync()
+        {
+            UserEntity user = await _userManager.FindByEmailAsync(_authenticatedUser.Email);
+
+            return Ok(new ResponseModel
+            {
+                Success = true,
+                Data = _userManager.Users.Include(i => i.Address).Select(s => new
+                {
+                    s.Id,
+                    s.UserName,
+                    s.Nome,
+                    s.CPF,
+                    s.Masculino,
+                    s.DataNascimento,
+                    s.Email,
+                    s.LockoutEnabled,
+                    s.Address,
+                    Roles = _userManager.GetRolesAsync(user).Result
+                }).FirstOrDefault(w => w.Email.Equals(_authenticatedUser.Email))
+            });
+        }
+
+
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
