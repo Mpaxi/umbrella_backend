@@ -20,6 +20,7 @@ namespace Umbrella.DrugStore.WebApi.Configuration
             builder.Property(p => p.Rating);
 
             builder.HasMany(o => o.Images).WithOne(m => m.Product).HasForeignKey(f => f.ProductId);
+            builder.HasMany(o => o.OrderProducts).WithOne(m => m.Product).HasForeignKey(f => f.ProductId);
         }
     }
 }

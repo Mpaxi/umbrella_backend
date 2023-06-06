@@ -12,8 +12,8 @@ using Umbrella.DrugStore.WebApi.Context;
 namespace Umbrella.DrugStore.WebApi.Migrations
 {
     [DbContext(typeof(BloggingContext))]
-    [Migration("20230527143128_Initial")]
-    partial class Initial
+    [Migration("20230606024229_Checkout")]
+    partial class Checkout
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -307,6 +307,112 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.ToTable("Image");
                 });
 
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Bairro")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CVV")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CardName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpireAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Numero")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrdeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quota")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Rua")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UF")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.OrderProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProducts");
+                });
+
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -413,14 +519,40 @@ namespace Umbrella.DrugStore.WebApi.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.OrderProduct", b =>
+                {
+                    b.HasOne("Umbrella.DrugStore.WebApi.Entities.Order", "Order")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Umbrella.DrugStore.WebApi.Entities.Product", "Product")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Auth.UserEntity", b =>
                 {
                     b.Navigation("Address");
                 });
 
+            modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
+                });
+
             modelBuilder.Entity("Umbrella.DrugStore.WebApi.Entities.Product", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("OrderProducts");
                 });
 #pragma warning restore 612, 618
         }
