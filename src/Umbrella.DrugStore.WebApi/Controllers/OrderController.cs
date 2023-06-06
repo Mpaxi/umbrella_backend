@@ -50,7 +50,7 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new ResponseModel { Data = entity });
+                return Ok(new ResponseModel { Data = entity.Entity });
             }
             catch (Exception ex)
             {
