@@ -101,6 +101,25 @@ namespace Umbrella.DrugStore.WebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
+        [Route("GetAdminOrderById")]
+        public async Task<IActionResult> GetAdminOrderById([FromQuery] Guid orderId)
+        {
+            try
+            {
+
+                var order = await _context.Orders.Include(i => i.OrderProducts).ThenInclude(ti => ti.Product).FirstOrDefaultAsync(f => f.Id == orderId);
+
+                return Ok(new ResponseModel { Data = order });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModel { Data = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Restockers}")]
         [Route("GetAllOrders")]
         public async Task<IActionResult> GetAllOrders()
         {

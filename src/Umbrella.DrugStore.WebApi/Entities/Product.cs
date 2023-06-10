@@ -1,4 +1,6 @@
-﻿namespace Umbrella.DrugStore.WebApi.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace Umbrella.DrugStore.WebApi.Entities
 {
     public class Product : BaseEntity
     {
@@ -8,6 +10,7 @@
         public int Unit { get; set; }
         public decimal Rating { get; set; }
         public List<Image> Images { get; set; } = new List<Image>();
+        [JsonIgnore]
         public IList<OrderProduct> OrderProducts { get; set; }
     }
 }
